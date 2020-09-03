@@ -137,11 +137,6 @@ comb = {1: comb_of_1, 2: comb_of_2, 3: comb_of_3,
         0: comb_of_0}
 
 
-def get_comb(count_blocks, value):
-    """Возвращает возможные значения для блоки и сумм
-
-    :param count_blocks: Количество блоков
-    :param value: Значение суммы
-
-    """
+def get_comb(count_blocks: int, value: int):
+    """Возвращает возможные значения для блоки и сумм"""
     return comb[count_blocks][value]

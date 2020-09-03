@@ -7,7 +7,7 @@ from KakuroExceptions import *
 class Board:
     """Класс представления головоломки"""
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.board = []
         self.game_desk = []
 
@@ -23,13 +23,8 @@ class Board:
         self.process_possible_value()
 
 
-    def parser_kakuro(self, filename):
-        """Парсит файл с головоломкой
-
-        :param filename: файл с головоломкой
-        :type filename: str
-
-        """
+    def parser_kakuro(self, filename: str):
+        """Парсит файл с головоломкой"""
         try:
             with open(filename, 'r') as file:
                 for line in file:

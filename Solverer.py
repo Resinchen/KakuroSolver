@@ -1,8 +1,10 @@
 from copy import deepcopy
 from enum import Enum
+from typing import Optional
 
 import sys
 
+from Board import Board
 from ValueBlock import ValueBlock
 from SumBlock import SumBlock
 
@@ -15,18 +17,13 @@ class Axis(Enum):
 class Solverer:
     """Класс, решающий головоломку"""
 
-    def __init__(self, board):
+    def __init__(self, board: type(Board)):
         self.board = board
         self.cache_boards = [self.board]
         self.solved = False
 
-    def remove_used_values(self, block):
-        """Удаляет использованные значения у собратьев по вертикали и горизонтали
-
-        :param block: блок, значение которого нужно удалить
-        :type block: ValueBlock
-
-        """
+    def remove_used_values(self, block: type(ValueBlock)):
+        """Удаляет использованные значения у собратьев по вертикали и горизонтали"""
         parent_v = block.parent_vertical
         parent_h = block.parent_horizontal
 
@@ -41,13 +38,12 @@ class Solverer:
                 child.possible_values.remove(block.current_value)
 
     @staticmethod
-    def print_solve(boards, count, outfilename=None):
+    def print_solve(boards, count: int, outfilename=None):
         """Печатает решение"""
         if count > len(boards):
             print('Количество решений меньше заданного')
             sys.exit(4)
         if outfilename is None:
-            # for board in boards[:count]:
             for i in range(count):
                 for row in boards[i]:
                     for block in row:
@@ -64,7 +60,7 @@ class Solverer:
             with open(outfilename, 'w') as f:
                 f.write(string)
 
-    def simple_step_solve_game(self, board):
+    def simple_step_solve_game(self, board: type(Board)):
         """Совершает минимальный шаг для решения головоломки"""
         for x in range(len(board)):
             for y in range(len(board[0])):
@@ -75,13 +71,13 @@ class Solverer:
                         self.remove_used_values(board[x][y])
                     self.board[x][y] = block
 
-    def get_simple_solve_game(self, board):
+    def get_simple_solve_game(self, board: type(Board)):
         """Создает решение головоломки через простые сочетания"""
         while self.is_have_simple_blocks(board):
             self.simple_step_solve_game(board)
 
     @staticmethod
-    def is_matrixx_fill(board):
+    def is_matrixx_fill(board: type(Board)):
         """Проверяет, заполнена ли головоломка"""
         for x in range(len(board)):
             for y in range(len(board[0])):
@@ -92,7 +88,7 @@ class Solverer:
         return True
 
     @staticmethod
-    def is_have_simple_blocks(board):
+    def is_have_simple_blocks(board: type(Board)):
         """Проверяет, есть ли в головоломке блоки с 1 возможным решением"""
         for x in range(len(board)):
             for y in range(len(board[0])):
@@ -103,12 +99,12 @@ class Solverer:
         return False
 
     @staticmethod
-    def is_have_alone_empty_block(block, axis):
+    def is_have_alone_empty_block(block: type(Board), axis: Axis):
         """Проверяет, есть ли один пустой блок в линии"""
-        if axis == 1:
+        if axis == Axis.HORIZONTAL:
             parrent_block = block.parent_horizontal
             child_list = parrent_block.horizontal_child
-        elif axis == 2:
+        elif axis == Axis.VERTICAL:
             parrent_block = block.parent_vertical
             child_list = parrent_block.vertical_child
         else:
@@ -117,20 +113,20 @@ class Solverer:
         current_values = [x.current_value for x in child_list]
         return current_values.count(-1) == 1
 
-    def get_sums_solve_game(self, board):
+    def get_sums_solve_game(self, board: type(Board)):
         """Создает решение головоломки через дополнение до суммы"""
         for x in range(len(board)):
             for y in range(len(board[0])):
                 if isinstance(board[x][y], ValueBlock):
-                    if self.is_have_alone_empty_block(board[x][y], Axis.HORIZONTAL.value):
-                        self.addition_to_the_sum(board[x][y].parent_horizontal, Axis.HORIZONTAL.value)
+                    if self.is_have_alone_empty_block(board[x][y], Axis.HORIZONTAL):
+                        self.addition_to_the_sum(board[x][y].parent_horizontal, Axis.HORIZONTAL)
         for x in range(len(board)):
             for y in range(len(board[0])):
                 if isinstance(board[x][y], ValueBlock):
-                    if self.is_have_alone_empty_block(board[x][y], Axis.VERTICAL.value):
-                        self.addition_to_the_sum(board[x][y].parent_vertical, Axis.VERTICAL.value)
+                    if self.is_have_alone_empty_block(board[x][y], Axis.VERTICAL):
+                        self.addition_to_the_sum(board[x][y].parent_vertical, Axis.VERTICAL)
 
-    def get_full_solve_game(self, board1):
+    def get_full_solve_game(self, board1: Optional[type(Board)]):
         """Полное решение головоломки"""
 
         board = deepcopy(board1 if board1 is not None else self.cache_boards[-1])
@@ -170,13 +166,13 @@ class Solverer:
             if len(self.cache_boards) > 1:
                 self.solved = True
 
-    def addition_to_the_sum(self, sum_block, axis):
+    def addition_to_the_sum(self, sum_block: type(SumBlock), axis: Axis):
         """Метод решения, путем дополнения до суммы"""
 
-        if axis == 1:
+        if axis == Axis.HORIZONTAL:
             sum_value = sum_block.horizontal_int
             child_list = sum_block.horizontal_child
-        elif axis == 2:
+        elif axis == Axis.VERTICAL:
             sum_value = sum_block.vertical_int
             child_list = sum_block.vertical_child
         else:
@@ -206,7 +202,7 @@ class Solverer:
                 target_block.current_value = vals
                 self.remove_used_values(target_block)
 
-    def checker(self, board):
+    def checker(self, board: type(Board)):
         """Проверяет правильность решения головоломки"""
 
         current_sum = 0
